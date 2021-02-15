@@ -5,6 +5,8 @@ import os.path
 
 from stocks.data_provider.interface import Interface
 
+# TODO: Update this with the new API changes!
+
 """
 This class provides data from a fixture. It takes-in a fixture directory that contains
 the result of each method call, segmented by argument (so kind of like a cache). The data
@@ -31,7 +33,7 @@ class Fixture(Interface):
             raise RuntimeError("fixture directory %s does not exist" % fixture_dir)
         self.fixture_dir = fixture_dir
 
-    def eod_data_bulk(self, date):
+    def eod_data_bulk(self, date, exchange):
         return self.read_data('eod_data_bulk', date)
 
     def data_path(self, method, *args):

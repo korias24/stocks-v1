@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
+# TODO: Change this interface later
 class Interface:
     """
-    Provides the EOD data in bulk. date should be an instance of datetime.date
-
-    TODO: Standardize the return value conventions
+    Provides EOD data for the given ticker
     """
-    def eod_data_bulk(self, date):
+    def eod_data(self, ticker, exchange, date):
+        pass
+
+    def fundamental_data(self, ticker, exchange):
         pass
