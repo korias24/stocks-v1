@@ -24,7 +24,7 @@ class EODHD(Interface):
 
     def eod_data(self, ticker, exchange, date):
         bulk_data = self.eod_data_bulk(exchange, date)
-        return next(filter(lambda d: d['code'] == ticker, bulk_data), None)
+        return bulk_data.get(ticker, {})
 
     """
     This is cached as
@@ -72,6 +72,17 @@ class EODHD(Interface):
     """
     @functools.lru_cache(maxsize = 21)
     def eod_data_bulk(self, exchange, date):
+        def op():
+            raw_data = self.eodhd_get(
+                "eod-bulk-last-day/%s" % exchange,
+                query_params = { 'date': str(date), 'filter': 'extended' }
+            )
+            data = {}
+            for d in raw_data:
+                ticker = d.pop('code')
+                data[ticker] = d
+            return data
+
         rel_path = os.path.join(
             'eod_data_bulk',
             exchange,
@@ -79,11 +90,7 @@ class EODHD(Interface):
             str(date.month),
             "%s.json" % date.day
         )
-        return self.cached_eodhd_get(
-            rel_path,
-            "eod-bulk-last-day/%s" % exchange,
-            query_params = { 'date': str(date), 'filter': 'extended' }
-        )
+        return self.cached_op(rel_path, op)
 
     """
     This is cached as
@@ -95,14 +102,18 @@ class EODHD(Interface):
     week. We can do this by storing it as tickers-<date>.json.
     """
     def tickers(self, exchange):
-        rel_path = os.path.join('tickers', "%s.json" % exchange)
-        return self.cached_eodhd_get(
-            rel_path,
-            "exchange-symbol-list/%s" % exchange
-        )
+        def op():
+            raw_data = self.eodhd_get(
+                "exchange-symbol-list/%s" % exchange
+            )
+            data = {}
+            for d in raw_data:
+                ticker = d.pop('Code')
+                data[ticker] = d
+            return data
 
-    def cached_eodhd_get(self, rel_path, endpoint, query_params = {}):
-        return self.cached_op(rel_path, lambda: self.eodhd_get(endpoint, query_params))
+        rel_path = os.path.join('tickers', "%s.json" % exchange)
+        return self.cached_op(rel_path, op)
 
     def cached_op(self, rel_path, op):
         abs_path = os.path.join(self._cache_dir, rel_path)
