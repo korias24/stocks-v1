@@ -40,16 +40,17 @@ def ignore_exchanges(*exchanges):
     sp = andp(*sp)
     return exchange(sp)
 
-def min_volume(v, from_date, to_date):
+def min_volume(v, from_date, to_date, min_satisfying):
     def f(tickers):
         np = gte(v)
         def p(ticker):
+            num_satisfying = 0
             delta = to_date - from_date
             for num_days in range(0, delta.days + 1):
                 date = from_date + datetime.timedelta(days = num_days)
                 if _dictp(ticker.eod_data(date), 'volume', np):
-                    return True
-            return False
+                    num_satisfying = num_satisfying + 1
+            return num_satisfying >= min_satisfying
 
         return list(filter(p, tickers))
 
@@ -71,7 +72,7 @@ with open('/Users/enis.inan/GitHub/stocks/ignored_companies.txt') as f:
     ignored = raw.split("\n")
 
 import datetime
-td = datetime.date(2021, 2, 12)
+td = datetime.date(2021, 2, 16)
 
 from stocks.data_provider.eodhd import EODHD
 dp = EODHD(api_token = os.environ.get('EODHD_API_TOKEN'), cache_dir = '/Users/enis.inan/.stocks_cache')
@@ -83,7 +84,13 @@ tickers = list(map(lambda symbol: Ticker(symbol, 'US', ticker_dict[symbol], dp),
 sfilter = andf(
     ignore_symbols(*ignored),
     ignore_exchanges('OTCGREY'),
-    close(td, andp(gte(0.01), lt(0.02))),
+    close(td, andp(gte(0.001), lt(0.01))),
+    #close(td, lt(0.1)),
+    # for 0.02 <= x < 0.03
+    #close(td, andp(gte(0.02), lt(0.03))),
+    # for 0.01 <= x < 0.02 stocks
+    #close(td, andp(gte(0.01), lt(0.02))),
     market_cap(td, gte(3000000)),
-    min_volume(1000000, td - datetime.timedelta(days = 14), td)
+    min_volume(20000000, td - datetime.timedelta(days = 14), td, 9)
+    #min_volume(1000000, td - datetime.timedelta(days = 14), td)
 )
