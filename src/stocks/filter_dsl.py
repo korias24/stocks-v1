@@ -72,7 +72,7 @@ with open('/Users/enis.inan/GitHub/stocks/ignored_companies.txt') as f:
     ignored = raw.split("\n")
 
 import datetime
-td = datetime.date(2021, 2, 16)
+td = datetime.date(2021, 2, 18)
 
 from stocks.data_provider.eodhd import EODHD
 dp = EODHD(api_token = os.environ.get('EODHD_API_TOKEN'), cache_dir = '/Users/enis.inan/.stocks_cache')
@@ -84,13 +84,14 @@ tickers = list(map(lambda symbol: Ticker(symbol, 'US', ticker_dict[symbol], dp),
 sfilter = andf(
     ignore_symbols(*ignored),
     ignore_exchanges('OTCGREY'),
-    close(td, andp(gte(0.001), lt(0.01))),
+    close(td, andp(gte(0.001), lt(0.03))),
+    # TODO: Add 3-5 cents
     #close(td, lt(0.1)),
     # for 0.02 <= x < 0.03
     #close(td, andp(gte(0.02), lt(0.03))),
     # for 0.01 <= x < 0.02 stocks
     #close(td, andp(gte(0.01), lt(0.02))),
     market_cap(td, gte(3000000)),
-    min_volume(20000000, td - datetime.timedelta(days = 14), td, 9)
+    min_volume(10000000, td - datetime.timedelta(days = 14), td, 3)
     #min_volume(1000000, td - datetime.timedelta(days = 14), td)
 )
