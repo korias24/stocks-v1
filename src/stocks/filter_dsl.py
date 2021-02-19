@@ -5,6 +5,9 @@ import functools
 
 from stocks.predicate import *
 
+def filter_tickers(p, tickers):
+    return list(filter(p, tickers))
+
 def andf(*fs):
     def _f(tickers):
         return functools.reduce(lambda _tickers, f: f(_tickers), fs, tickers)
@@ -19,19 +22,19 @@ def _dictp(d, k, p):
 
 def close(td, np):
     def f(tickers):
-        return list(filter(lambda t: _dictp(t.eod_data(td), 'close', np), tickers))
+        return filter_tickers(lambda t: _dictp(t.eod_data(td), 'close', np), tickers)
 
     return f
 
 def market_cap(td, np):
     def f(tickers):
-        return list(filter(lambda t: _dictp(t.eod_data(td), 'MarketCapitalization', np), tickers))
+        return filter_tickers(lambda t: _dictp(t.eod_data(td), 'MarketCapitalization', np), tickers)
 
     return f
 
 def exchange(sp):
     def f(tickers):
-        return list(filter(lambda t: sp(t.exchange), tickers))
+        return filter_tickers(lambda t: sp(t.exchange), tickers)
 
     return f
 
@@ -52,13 +55,13 @@ def min_volume(v, from_date, to_date, min_satisfying):
                     num_satisfying = num_satisfying + 1
             return num_satisfying >= min_satisfying
 
-        return list(filter(p, tickers))
+        return filter_tickers(p, tickers)
 
     return f
 
 def symbol(sp):
     def f(tickers):
-        return list(filter(lambda t: sp(t.symbol), tickers))
+        return filter_tickers(lambda t: sp(t.symbol), tickers)
 
     return f
 
@@ -92,6 +95,6 @@ sfilter = andf(
     # for 0.01 <= x < 0.02 stocks
     #close(td, andp(gte(0.01), lt(0.02))),
     market_cap(td, gte(3000000)),
-    min_volume(10000000, td - datetime.timedelta(days = 14), td, 3)
+    min_volume(10000000, td - datetime.timedelta(days = 14), td, 1)
     #min_volume(1000000, td - datetime.timedelta(days = 14), td)
 )
