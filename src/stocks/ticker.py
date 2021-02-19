@@ -22,6 +22,12 @@ class Ticker:
     def eod_data(self, date):
         return self._dp.eod_data(self.symbol, self._exchange_code, date)
 
+    def __str__(self):
+        return "(%s, %s, %s)" % (self.symbol, self.company, self.exchange)
+
+    def __repr__(self):
+        return self.__str__()
+
     """
     If I want to take any averages of the data, I'll have to use the ticker-specific EOD
     endpoint. E.g. eod/ticker/from_date_to_date ...
