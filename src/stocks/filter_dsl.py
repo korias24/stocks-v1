@@ -6,7 +6,7 @@ import functools
 from stocks.predicate import *
 
 def filter_tickers(p, tickers):
-    return list(filter(p, tickers))
+    return {symbol: ticker for symbol, ticker in tickers.items() if p(ticker)}
 
 def andf(*fs):
     def _f(tickers):
@@ -81,8 +81,7 @@ from stocks.data_provider.eodhd import EODHD
 dp = EODHD(api_token = os.environ.get('EODHD_API_TOKEN'), cache_dir = '/Users/enis.inan/.stocks_cache')
 
 from stocks.ticker import Ticker
-ticker_dict = dp.tickers('US')
-tickers = list(map(lambda symbol: Ticker(symbol, 'US', ticker_dict[symbol], dp), ticker_dict))
+tickers = dp.tickers('US')
 
 sfilter = andf(
     ignore_symbols(*ignored),

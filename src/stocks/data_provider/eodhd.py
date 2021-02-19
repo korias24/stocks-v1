@@ -6,6 +6,7 @@ import os.path
 import requests
 
 from stocks.data_provider.interface import Interface
+from stocks.ticker import Ticker
 
 """
 This class fetches data from EOD Historical Data. Its constructor requires
@@ -113,7 +114,8 @@ class EODHD(Interface):
             return data
 
         rel_path = os.path.join('tickers', "%s.json" % exchange)
-        return self.cached_op(rel_path, op)
+        raw_tickers = self.cached_op(rel_path, op)
+        return {symbol: Ticker(symbol, exchange, metadata, self) for symbol, metadata in raw_tickers.items()}
 
     def cached_op(self, rel_path, op):
         abs_path = os.path.join(self._cache_dir, rel_path)
