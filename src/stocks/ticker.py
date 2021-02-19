@@ -26,7 +26,7 @@ class Ticker:
         return "(%s, %s, %s)" % (self.symbol, self.company, self.exchange)
 
     def __repr__(self):
-        return self.__str__()
+        return str(self)
 
     """
     If I want to take any averages of the data, I'll have to use the ticker-specific EOD
