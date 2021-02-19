@@ -22,6 +22,9 @@ class Ticker:
     def eod_data(self, date):
         return self._dp.eod_data(self.symbol, self._exchange_code, date)
 
+    def eod_data_range(self, from_date, to_date):
+        return self._dp.eod_data_range(self.symbol, self._exchange_code, from_date, to_date)
+
     def __str__(self):
         return "(%s, %s, %s)" % (self.symbol, self.company, self.exchange)
 

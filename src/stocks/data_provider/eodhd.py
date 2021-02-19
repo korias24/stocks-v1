@@ -30,6 +30,33 @@ class EODHD(Interface):
     """
     This is cached as
         <cache_dir>
+            eod_data_range
+                <exchange>
+                    <ticker>
+                        <from>_<to>.json
+    """
+    def eod_data_range(self, ticker, exchange, from_date, to_date):
+        def op():
+            return self.eodhd_get(
+                "eod/%s.%s" % (ticker, exchange),
+                { 'from': str(from_date), 'to': str(to_date) }
+            )
+
+        rel_path = os.path.join(
+            'eod_data_range',
+            exchange,
+            ticker,
+            "%s_%s.json" % (from_date, to_date)
+        )
+        return self.cached_op(
+            rel_path,
+            op
+        )
+
+
+    """
+    This is cached as
+        <cache_dir>
             fundamental_data
                 <exchange>
                     <ticker>.json

@@ -8,5 +8,8 @@ class Interface:
     def eod_data(self, ticker, exchange, date):
         pass
 
+    def eod_data_range(self, ticker, exchange, from_date, to_date):
+        pass
+
     def fundamental_data(self, ticker, exchange):
         pass
