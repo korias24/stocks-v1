@@ -64,17 +64,19 @@ class EODHD(Interface):
     def fundamental_data(self, ticker, exchange):
         def op():
             data = self.eodhd_get("fundamentals/%s.%s" % (ticker, exchange))
-            # data is large so just return what we need.
-            #
-            # TODO: we may need to re-evaluate this approach
-            # if our subset becomes too large
-            subset = {}
-            general_data = data.get('General')
-            if general_data:
-                subset['company'] = general_data.get('Name')
-                for key in ['Sector', 'Industry', 'Exchange']:
-                    subset[key.lower()] = general_data.get(key)
-            return subset
+            return data
+#            TODO: Reenable if we need subset again, remember to clear cache dir
+#            # data is large so just return what we need.
+#            #
+#            # TODO: we may need to re-evaluate this approach
+#            # if our subset becomes too large
+#            subset = {}
+#            general_data = data.get('General')
+#            if general_data:
+#                subset['company'] = general_data.get('Name')
+#                for key in ['Sector', 'Industry', 'Exchange']:
+#                    subset[key.lower()] = general_data.get(key)
+#            return subset
 
         rel_path = os.path.join(
             'fundamental_data',

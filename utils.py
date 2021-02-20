@@ -31,7 +31,7 @@ tickers = dp.tickers('US')
 sfilter = andf(
     ignore_symbols(*parse_ignored_companies()),
     ignore_exchanges('OTCGREY'),
-    close(td, andp(gte(0.03), lt(0.06))),
+    close(td, andp(gte(0), lt(0.03))),
     market_cap(td, gte(3000000)),
     min_volume(10000000, td - datetime.timedelta(days = 14), td, 1)
 )
