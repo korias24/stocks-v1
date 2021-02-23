@@ -20,6 +20,9 @@ def _dictp(d, k, p):
         return p(d[k])
     return False
 
+# NOTE: be careful when doing e.g. gte(0) here, because EODHD will set companies
+# with "null" close price to 0 so you may end up including stocks that are actually
+# quite expensive
 def close(td, np):
     def f(tickers):
         return filter_tickers(lambda t: _dictp(t.eod_data(td), 'close', np), tickers)

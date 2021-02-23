@@ -23,7 +23,7 @@ def write_tickers(path, tickers):
     with open(path, 'w') as f:
         f.write("\n".join([t.symbol for _, t in tickers.items()]))
 
-td = datetime.date(2021, 2, 19)
+td = datetime.date(2021, 2, 22)
 dp = EODHD(api_token = os.environ.get('EODHD_API_TOKEN'), cache_dir = '/Users/enis.inan/.stocks_cache')
 tickers = dp.tickers('US')
 
@@ -31,7 +31,7 @@ tickers = dp.tickers('US')
 sfilter = andf(
     ignore_symbols(*parse_ignored_companies()),
     ignore_exchanges('OTCGREY'),
-    close(td, andp(gte(0), lt(0.03))),
+    close(td, andp(gt(0), lt(0.05))),
     market_cap(td, gte(3000000)),
-    min_volume(10000000, td - datetime.timedelta(days = 14), td, 1)
+    min_volume(1000000, td - datetime.timedelta(days = 14), td, 1)
 )
