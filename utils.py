@@ -6,8 +6,8 @@ from stocks.data_provider.eodhd import EODHD
 from stocks.filter_dsl import *
 from stocks.predicate import *
 
-def parse_ignored_companies():
-    with open('/Users/enis.inan/GitHub/stocks/ignored_companies.txt') as f:
+def parse_ignored_companies(path = '/Users/enis.inan/GitHub/stocks/ignored_companies.txt'):
+    with open(path) as f:
         raw = f.read()
         ignored = raw.split("\n")
 
@@ -23,15 +23,22 @@ def write_tickers(path, tickers):
     with open(path, 'w') as f:
         f.write("\n".join([t.symbol for _, t in tickers.items()]))
 
-td = datetime.date(2021, 2, 25)
+td = datetime.date(2021, 2, 26)
 dp = EODHD(api_token = os.environ.get('EODHD_API_TOKEN'), cache_dir = '/Users/enis.inan/.stocks_cache')
 tickers = dp.tickers('US')
 
-# sfilter => stocks filter
-sfilter = andf(
+# dfilter => default filter
+dfilter = andf(
     ignore_symbols(*parse_ignored_companies()),
     ignore_exchanges('OTCGREY'),
     close(td, andp(gt(0), lt(0.05))),
     market_cap(td, gte(3000000)),
     min_volume(1000000, td - datetime.timedelta(days = 14), td, 1)
+)
+
+sfilter = andf(
+    ignore_exchanges('OTCGREY'),
+    close(td, andp(gt(0), lt(0.005))),
+    market_cap(td, gte(3000000)),
+    min_volume(2000000, td - datetime.timedelta(days = 14), td, 7)
 )
