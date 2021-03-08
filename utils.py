@@ -23,7 +23,7 @@ def write_tickers(path, tickers):
     with open(path, 'w') as f:
         f.write("\n".join([t.symbol for _, t in tickers.items()]))
 
-td = datetime.date(2021, 3, 3)
+td = datetime.date(2021, 3, 5)
 dp = EODHD(api_token = os.environ.get('EODHD_API_TOKEN'), cache_dir = '/Users/enis.inan/.stocks_cache')
 tickers = dp.tickers('US')
 
