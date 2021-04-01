@@ -23,6 +23,27 @@ def write_tickers(path, tickers):
     with open(path, 'w') as f:
         f.write("\n".join([t.symbol for _, t in tickers.items()]))
 
+def construct_sfilter(td):
+    return andf(
+            ignore_symbols(*parse_ignored_companies('/Users/enis.inan/GitHub/stocks/absolutely_ignored_companies.txt')),
+            ignore_symbols(*parse_ignored_companies('/Users/enis.inan/GitHub/stocks/temporarily_ignored_companies.txt')),
+            ignore_exchanges('OTCGREY'),
+            close(td, andp(gt(0), lt(0.005))),
+            market_cap(td, gt(0)),
+            market_cap(td, gte(3000000)),
+            min_volume(20000000, td - datetime.timedelta(days = 14), td, 5)
+    )
+
+def fetch_tickers_in_range(construct_filter, all_tickers, from_date, to_date):
+    result = {}
+
+    delta = to_date - from_date
+    for num_days in range(0, delta.days + 1):
+        date = from_date + datetime.timedelta(days = num_days)
+        result.update(construct_filter(date)(all_tickers))
+
+    return result
+
 td = datetime.date(2021, 3, 18)
 dp = EODHD(api_token = os.environ.get('EODHD_API_TOKEN'), cache_dir = '/Users/enis.inan/.stocks_cache')
 tickers = dp.tickers('US')
@@ -38,15 +59,7 @@ dfilter = andf(
     min_volume(10000000, td - datetime.timedelta(days = 14), td, 3)
 )
 
-sfilter = andf(
-    ignore_symbols(*parse_ignored_companies('/Users/enis.inan/GitHub/stocks/absolutely_ignored_companies.txt')),
-    ignore_symbols(*parse_ignored_companies('/Users/enis.inan/GitHub/stocks/temporarily_ignored_companies.txt')),
-    ignore_exchanges('OTCGREY'),
-    close(td, andp(gt(0), lt(0.005))),
-    market_cap(td, gt(0)),
-    #market_cap(td, gte(3000000)),
-    min_volume(20000000, td - datetime.timedelta(days = 14), td, 5)
-)
+sfilter = construct_sfilter(td)
 
 print("REMINDER: DELETE TEMPORARILY IGNORED COMPANIES")
 
