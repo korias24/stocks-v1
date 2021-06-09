@@ -28,7 +28,7 @@ def construct_sfilter(td):
             ignore_symbols(*parse_ignored_companies('/Users/enis.inan/GitHub/stocks/absolutely_ignored_companies.txt')),
             ignore_symbols(*parse_ignored_companies('/Users/enis.inan/GitHub/stocks/temporarily_ignored_companies.txt')),
             ignore_exchanges('OTCGREY'),
-            close(td, andp(gt(0), lt(0.01))),
+            close(td, andp(gt(0), lte(0.05))),
             #close(td, andp(gt(0), lt(0.10))),
             market_cap(td, gt(0)),
             market_cap(td, gte(3000000)),
